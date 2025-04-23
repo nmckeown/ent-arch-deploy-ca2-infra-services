@@ -72,6 +72,10 @@ jobs:
         run: terraform init
         working-directory: ./IaC
 
+      - name: Import existing resource
+        run: |
+          terraform import azurerm_resource_group.aks_rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/eadca2aksrg
+
       - name: Terraform Destroy
         run: terraform apply -auto-approve
         working-directory: ./IaC
