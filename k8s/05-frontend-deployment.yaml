@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: recipetracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: noelmckeown/frontend:latest
+          ports:
+            - containerPort: 9000
+          env:
+            - name: BACKEND_HOST
+              value: backend
+            - name: BACKEND_PORT
+              value: "8080"
+            - name: FRONTEND_PORT
+              value: "22137"
+          resources:
+            requests:
+              cpu: "100m"
+            limits:
+              cpu: "500m"
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: recipetracker
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 22137

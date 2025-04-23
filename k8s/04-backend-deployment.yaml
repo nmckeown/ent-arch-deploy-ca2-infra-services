@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: recipetracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: noelmckeown/backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGODB_CONN
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-conn-secret
+                  key: mongo-conn
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-uri-secret
+                  key: mongo-uri
+          resources:
+            requests:
+              cpu: "100m"
+            limits:
+              cpu: "500m"
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: recipetracker
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

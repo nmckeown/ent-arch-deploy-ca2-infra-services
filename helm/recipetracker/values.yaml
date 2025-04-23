@@ -1,0 +1,27 @@
+namespace: recipetracker
+
+backend:
+  image: noelmckeown/backend:latest
+  port: 8080
+  cpu: "100m"
+  memory: "500m"
+
+frontend:
+  image: noelmckeown/frontend:latest
+  servicePort: 9000
+  containerPort: 22137
+  cpu: "100m"
+  memory: "500m"
+
+mongoSecrets:
+  conn: bW9uZ29kYitzcnY6Ly9ub2VsbWNrZW93bjo2QXlMSFlHa29jbzFAZW50LWFyY2gtZGVwbG95LWNhMi1tb24uYm5vZmVmZy5tb25nb2RiLm5ldC8/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5JmFwcE5hbWU9ZW50LWFyY2gtZGVwbG95LWNhMi1tb25nbw==
+  uri: bW9uZ29kYitzcnY6Ly9ub2VsbWNrZW93bjo2QXlMSFlHa29jbzFAZW50LWFyY2gtZGVwbG95LWNhMi1tb24uYm5vZmVmZy5tb25nb2RiLm5ldC8=
+
+dockerSecrets:
+  conn: eyJhdXRocyI6eyJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOnsidXNlcm5hbWUiOiJub2VsbWNrZW93biIsInBhc3N3b3JkIjoiTGV4YWNvbkAxMCIsImVtYWlsIjoibm9lbG1ja2Vvd25AZ21haWwuY29tIiwiYXV0aCI6ImJtOWxiRzFqYTJWdmQyNDZUR1Y0WVdOdmJrQXhNQT09In19fQ==
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  cpuUtilization: 50
