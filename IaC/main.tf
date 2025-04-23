@@ -99,7 +99,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     admin_username = "azureuser"
 
     ssh_key {
-      key_data = file("~/.ssh/id_rsa.pub")
+      key_data = file(".ssh/id_rsa.pub")
     }
   }
 

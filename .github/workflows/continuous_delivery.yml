@@ -12,8 +12,9 @@ on:
 
 # workflow jobs
 jobs:
-  terraform:
-    name: Provision AKS Cluster
+  provision_infra:
+    name: Provision Infrastructure
+    if: true
     runs-on: ubuntu-latest
 
     env:
@@ -45,4 +46,32 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+        working-directory: ./IaC
+
+  destroy_infra:
+    name: Destroy Infrastructure
+    if: true
+    runs-on: ubuntu-latest
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./IaC
+
+      - name: Terraform Destroy
+        run: terraform apply -auto-approve
         working-directory: ./IaC
