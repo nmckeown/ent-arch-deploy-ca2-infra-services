@@ -50,7 +50,7 @@ jobs:
 
   destroy_infra:
     name: Destroy Infrastructure
-    if: true
+    if: false
     runs-on: ubuntu-latest
 
     env:
