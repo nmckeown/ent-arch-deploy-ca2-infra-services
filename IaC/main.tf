@@ -138,7 +138,7 @@ resource "azurerm_role_assignment" "aks_network_contributor" {
 terraform {
   backend "azurerm" {
     resource_group_name   = "eadca2rg"
-    storage_account_name  = "mytfstateaccount"
+    storage_account_name  = "eadca2rgstateaccount"
     container_name        = "tfstate"
     key                   = "terraform.tfstate"
   }
