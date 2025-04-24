@@ -137,7 +137,7 @@ resource "azurerm_role_assignment" "aks_network_contributor" {
 # storage for sharing tfstate file
 terraform {
   backend "azurerm" {
-    resource_group_name   = "eadca2aksrg"
+    resource_group_name   = "eadca2rg"
     storage_account_name  = "mytfstateaccount"
     container_name        = "tfstate"
     key                   = "terraform.tfstate"
