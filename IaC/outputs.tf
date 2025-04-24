@@ -8,5 +8,5 @@ output "cluster_name" {
 }
 
 output "aks_fqdn" {
-  value = azurerm_kubernetes_cluster.example.fqdn
+  value = azurerm_kubernetes_cluster.aks_cluster.fqdn
 }
