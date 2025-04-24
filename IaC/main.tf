@@ -143,8 +143,3 @@ terraform {
     key                   = "terraform.tfstate"
   }
 }
-
-variable "subscription_id" {
-  type = string
-  sensitive = true
-}
