@@ -14,7 +14,7 @@ on:
 jobs:
   provision_infra:
     name: Provision Infrastructure
-    if: false
+    if: true
     runs-on: ubuntu-latest
 
     env:
@@ -50,7 +50,7 @@ jobs:
 
   destroy_infra:
     name: Destroy Infrastructure
-    if: true
+    if: false
     runs-on: ubuntu-latest
 
     env:
@@ -82,7 +82,7 @@ jobs:
 
   deploy_helm:
     name: Deploy Helm to AKS
-    if: false
+    if: true
     runs-on: ubuntu-latest
 
     steps:
