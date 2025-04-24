@@ -7,9 +7,9 @@ import http from "k6/http";
 //
 export let options = {
 
-  // Either specify vus + duration or stages
-  // vus: 20,
-  // duration: "3m",
+  // Either specify vus + duration or stages 
+  vus: 1000,
+  //duration: "3m",
 
   // This stages configuration will ramp to 20 Virtual Users over a minute,
   // maintain those 20 concurrent users for 1 minute
@@ -45,7 +45,7 @@ export let options = {
 // Export a default function - this defines the entry point for your VUs,
 // similar to the main() function in many other languages.
 export default function() {
-  let res = http.get("https://ca1app-staging.azurewebsites.net/");
+  let res = http.get("http://135.236.172.123:9000/");
 
   check(res, {
       "is status 200": (r) => r.status === 200
