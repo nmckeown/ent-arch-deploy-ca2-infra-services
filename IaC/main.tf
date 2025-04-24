@@ -5,18 +5,18 @@ provider "azurerm" {
     }
   }
 
-  subscription_id = "9ec68712-3805-4cf9-a4c1-4e5951df302b"
+  subscription_id = var.subscription_id
 }
 
 # Create Resource Group
 resource "azurerm_resource_group" "rg" {
-  name     = "eadca2aksrg"
-  location = "North Europe"
+  name     = var.resource_group_name
+  location = var.location
 }
 
 # Create Public IP
 resource "azurerm_public_ip" "outbound_ip" {
-  name                = "EADCA2AKSOutboundIP"
+  name                = "${var.aks_cluster_name}OutboundIP"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
@@ -25,7 +25,7 @@ resource "azurerm_public_ip" "outbound_ip" {
 
 # Create Log Analytics Workspace for Monitoring
 resource "azurerm_log_analytics_workspace" "log_workspace" {
-  name                = "EADCA2AKSWorkspace"
+  name                = "${var.aks_cluster_name}Workspace"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = "PerGB2018"
@@ -34,7 +34,7 @@ resource "azurerm_log_analytics_workspace" "log_workspace" {
 
 # Create Network Security Group
 resource "azurerm_network_security_group" "aks_nsg" {
-  name                = "EADCA2AKS-NSG"
+  name                = "${var.aks_cluster_name}-NSG"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -58,7 +58,7 @@ resource "azurerm_network_security_group" "aks_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "86.45.172.213"
+    source_address_prefix      = var.allowed_ssh_ip
     destination_address_prefix = "*"
   }
 
@@ -75,31 +75,31 @@ resource "azurerm_network_security_group" "aks_nsg" {
   }
 
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
 }
 
 # Create AKS Cluster
 resource "azurerm_kubernetes_cluster" "aks_cluster" {
-  name                = "EADCA2AKS"
+  name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "eadca2aks"
+  dns_prefix          = lower(var.aks_cluster_name)
   sku_tier            = "Premium"
   kubernetes_version  = "1.29.5"
   support_plan        = "AKSLongTermSupport"
 
   default_node_pool {
     name       = "default"
-    node_count = 2
-    vm_size    = "Standard_B2s"
+    node_count = var.node_count
+    vm_size    = var.vm_size
   }
 
   linux_profile {
     admin_username = "azureuser"
 
     ssh_key {
-      key_data = file(".ssh/id_rsa.pub")
+      key_data = file(var.ssh_public_key)
     }
   }
 
@@ -109,7 +109,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
 
   network_profile {
     network_plugin = "azure"
-    network_policy = "azure"  # Enable network policies
+    network_policy = "azure"
 
     load_balancer_profile {
       outbound_ip_address_ids = [
@@ -123,9 +123,8 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   }
 
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
-
 }
 
 # network identity for load balancer
@@ -133,4 +132,19 @@ resource "azurerm_role_assignment" "aks_network_contributor" {
   scope                = azurerm_resource_group.rg.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.aks_cluster.identity[0].principal_id
+}
+
+# storage for sharing tfstate file
+terraform {
+  backend "azurerm" {
+    resource_group_name   = azurerm_resource_group.rg.name
+    storage_account_name  = "mytfstateaccount"
+    container_name        = "tfstate"
+    key                   = "terraform.tfstate"
+  }
+}
+
+variable "subscription_id" {
+  type = string
+  sensitive = true
 }

@@ -6,3 +6,7 @@ output "kube_config" {
 output "cluster_name" {
   value = azurerm_kubernetes_cluster.aks_cluster.name
 }
+
+output "aks_fqdn" {
+  value = azurerm_kubernetes_cluster.example.fqdn
+}

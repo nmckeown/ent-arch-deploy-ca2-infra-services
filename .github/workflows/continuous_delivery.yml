@@ -26,6 +26,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+  
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -63,6 +68,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -83,6 +93,7 @@ jobs:
   deploy_helm:
     name: Deploy Helm to AKS
     if: true
+    needs: [ provision_infra ]
     runs-on: ubuntu-latest
 
     steps:
