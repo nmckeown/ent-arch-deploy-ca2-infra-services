@@ -14,7 +14,7 @@ on:
 jobs:
   provision_infra:
     name: Provision Infrastructure
-    if: false
+    if: true
     runs-on: ubuntu-latest
 
     env:
@@ -55,7 +55,7 @@ jobs:
 
   destroy_infra:
     name: Destroy Infrastructure
-    if: true
+    if: false
     runs-on: ubuntu-latest
 
     env:
@@ -82,7 +82,7 @@ jobs:
         run: terraform init
         working-directory: ./IaC
 
-      - name: Import existing resource
+      - name: Import Existing Resource
         run: |
           terraform import azurerm_resource_group.aks_rg /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/eadca2aksrg
 
@@ -92,7 +92,7 @@ jobs:
 
   deploy_helm:
     name: Deploy Helm to AKS
-    if: false
+    if: true
     needs: [ provision_infra ]
     runs-on: ubuntu-latest
 
@@ -119,3 +119,39 @@ jobs:
         run: |
           helm install recipetracker ./recipetracker 
         working-directory: ./helm
+
+  blue_green:
+    name: Blue / Green Deployment
+    if: false
+    needs: [ deploy_helm ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.ARM_CLIENT_ID }}
+          tenant-id: ${{ secrets.ARM_TENANT_ID }}
+          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          cluster-name: ${{ env.AKS_CLUSTER  }}
+
+      - name: Deploy Green Version
+        run: |
+          kubectl apply -f k8s/deployment-green.yaml
+
+      - name: Wait For Green
+        run: |
+          kubectl rollout status deployment/your-green-deployment
+
+      - name: Switch To Green
+        run: |
+          kubectl patch service your-service-name \
+            -p '{"spec": {"selector": {"app": "your-green-app"}}}'
