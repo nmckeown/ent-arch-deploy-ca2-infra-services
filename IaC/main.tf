@@ -134,6 +134,35 @@ resource "azurerm_role_assignment" "aks_network_contributor" {
   principal_id         = azurerm_kubernetes_cluster.aks_cluster.identity[0].principal_id
 }
 
+# Create Recovery Services Vault for AKS Backup
+resource "azurerm_recovery_services_vault" "vault" {
+  name                = "${var.aks_cluster_name}-vault"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard"
+  soft_delete_enabled = true
+
+  tags = {
+    environment = var.environment
+  }
+}
+
+# Enable Azure Backup for AKS
+resource "azurerm_backup_policy_vm" "backup_policy" {
+  name                = "${var.aks_cluster_name}-policy"
+  resource_group_name = azurerm_resource_group.rg.name
+  recovery_vault_name = azurerm_recovery_services_vault.vault.name
+
+  backup {
+    frequency = "Daily"
+    time      = "23:00"
+  }
+
+  retention_daily {
+    count = var.backup_retention_days
+  }
+}
+
 # storage for sharing tfstate file
 terraform {
   backend "azurerm" {

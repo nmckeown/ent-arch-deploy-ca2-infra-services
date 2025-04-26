@@ -52,3 +52,21 @@ variable "allowed_ssh_ip" {
   description = "IP address allowed for SSH access"
   default     = "86.45.172.213"
 }
+
+variable "backup_retention_days" {
+  type        = number
+  description = "Number of days to retain daily backups"
+  default     = 30
+}
+
+variable "backup_schedule" {
+  type        = string
+  description = "Backup schedule in cron format (UTC)"
+  default     = "0 0 * * *"  # Daily at midnight UTC
+}
+
+variable "backup_enabled" {
+  type        = bool
+  description = "Enable or disable VM backup for AKS nodes"
+  default     = true
+}
