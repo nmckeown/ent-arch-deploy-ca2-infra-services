@@ -45,7 +45,7 @@ export let options = {
 // Export a default function - this defines the entry point for your VUs,
 // similar to the main() function in many other languages.
 export default function() {
-  let res = http.get("http://135.236.172.123:9000/");
+  let res = http.get("http://172.205.83.196:9000/");
 
   check(res, {
       "is status 200": (r) => r.status === 200

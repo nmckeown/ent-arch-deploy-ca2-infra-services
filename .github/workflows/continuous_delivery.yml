@@ -14,7 +14,7 @@ on:
 jobs:
   provision_infra:
     name: Provision Infrastructure
-    if: true
+    if: false
     runs-on: ubuntu-latest
 
     env:
@@ -92,7 +92,7 @@ jobs:
 
   deploy_helm:
     name: Deploy Helm to AKS
-    if: true
+    if: false
     needs: [ provision_infra ]
     runs-on: ubuntu-latest
 
@@ -122,7 +122,7 @@ jobs:
 
   blue_green:
     name: Blue / Green Deployment
-    if: false
+    if: true
     needs: [ deploy_helm ]
     runs-on: ubuntu-latest
 
@@ -143,15 +143,25 @@ jobs:
           resource-group: ${{ env.RESOURCE_GROUP }}
           cluster-name: ${{ env.AKS_CLUSTER  }}
 
+      - name: Manual Approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: nmckeown
+          minimum-approvals: 1
+          issue-title: "Approval Green Deployment"
+          issue-body: "Approve this to start rolling out Green Deployment."
+
       - name: Deploy Green Version
         run: |
-          kubectl apply -f k8s/deployment-green.yaml
+          kubectl -n recipetracker apply -f k8s/07-frontend-green-deployment.yaml
 
       - name: Wait For Green
         run: |
-          kubectl rollout status deployment/your-green-deployment
+          kubectl -n recipetracker rollout status deployment/frontend-green
 
       - name: Switch To Green
         run: |
-          kubectl patch service your-service-name \
-            -p '{"spec": {"selector": {"app": "your-green-app"}}}'
+          kubectl patch service frontend \
+            -n recipetracker \
+            -p '{"spec": {"selector": {"app": "frontend-green"}}}'
