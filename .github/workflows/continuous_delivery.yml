@@ -138,8 +138,8 @@ jobs:
       - name: Set AKS Context
         uses: azure/aks-set-context@v3
         with:
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          cluster-name: ${{ env.AKS_CLUSTER  }}
+          resource-group: ${{ vars.RESOURCE_GROUP }}
+          cluster-name: ${{ vars.AKS_CLUSTER  }}
 
       - name: Manual Approval
         uses: trstringer/manual-approval@v1
