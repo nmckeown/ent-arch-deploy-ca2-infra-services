@@ -123,7 +123,7 @@ jobs:
   blue_green:
     name: Blue / Green Deployment
     if: true
-    needs: [ deploy_helm ]
+    #needs: [ deploy_helm ]
     runs-on: ubuntu-latest
 
     steps:
