@@ -14,7 +14,7 @@ on:
 jobs:
   provision_infra:
     name: Provision Infrastructure
-    if: false
+    if: true
     runs-on: ubuntu-latest
 
     env:
@@ -92,7 +92,7 @@ jobs:
 
   deploy_helm:
     name: Deploy Helm to AKS
-    if: false
+    if: true
     needs: [ provision_infra ]
     runs-on: ubuntu-latest
 
@@ -123,7 +123,7 @@ jobs:
   blue_green:
     name: Blue / Green Deployment
     if: true
-    #needs: [ deploy_helm ]
+    needs: [ deploy_helm ]
     runs-on: ubuntu-latest
     permissions:
       issues: write
