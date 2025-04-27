@@ -125,6 +125,8 @@ jobs:
     if: true
     #needs: [ deploy_helm ]
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
 
     steps:
       - name: Checkout Repo
